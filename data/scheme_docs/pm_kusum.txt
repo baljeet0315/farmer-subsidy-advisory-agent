@@ -1,0 +1,22 @@
+SCHEME: PM-KUSUM (Solar Pump Scheme) - Component B
+Level: national
+Source: https://www.myscheme.gov.in/schemes/pm-kusum (verified 2026-06-29)
+
+OVERVIEW
+Subsidy for installing a stand-alone solar agriculture pump (up to 7.5 HP) for off-grid farms. Central + state subsidy covers up to 60% of cost, ~30% bank loan, remainder by the farmer. Reduces diesel dependence and irrigation cost.
+
+WHO IS ELIGIBLE
+Component B targets individual farmers in off-grid / low-grid areas. Component C (grid-connected pump solarisation) is a separate track.
+
+DOCUMENTS REQUIRED
+- Aadhaar card
+- Land records
+- Bank account
+- Photograph
+- Authorisation/declaration of irrigation need
+
+HOW TO APPLY
+Apply through the state nodal agency portal or the national PM-KUSUM portal; the discom/agency verifies and allots a vendor.
+
+WHERE TO APPLY
+pmkusum.mnre.gov.in / State renewable energy / agriculture department

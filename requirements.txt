@@ -1,0 +1,27 @@
+# Core
+python-dotenv>=1.0.0
+pandas>=2.2.0
+pydantic>=2.6.0
+
+# LLMs (two-model ensemble)
+anthropic>=0.40.0
+openai>=1.40.0
+
+# RAG / embeddings / vector store
+sentence-transformers>=3.0.0
+chromadb>=0.5.0
+
+# Web app + reviewer dashboard
+streamlit>=1.36.0
+
+# WhatsApp channel
+fastapi>=0.111.0
+uvicorn>=0.30.0
+twilio>=9.2.0
+
+# Eval / testing
+pytest>=8.2.0
+scikit-learn>=1.5.0
+
+# Utilities
+tabulate>=0.9.0

@@ -1,0 +1,21 @@
+SCHEME: PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)
+Level: national
+Source: https://www.myscheme.gov.in/schemes/pm-kisan (verified 2026-06-29)
+
+OVERVIEW
+Income support of Rs 6,000 per year paid in three equal installments of Rs 2,000 directly to the bank account of eligible landholding farmer families.
+
+WHO IS ELIGIBLE
+Excludes income-tax payers, government employees, pensioners drawing >Rs 10,000/month, and institutional landholders. These exclusions are advisory (not captured in the profile).
+
+DOCUMENTS REQUIRED
+- Aadhaar card
+- Land ownership records (khasra/khatauni)
+- Bank account linked to Aadhaar
+- Mobile number
+
+HOW TO APPLY
+Register online at pmkisan.gov.in (Farmer's Corner > New Farmer Registration) or via the nearest Common Service Centre (CSC), then complete e-KYC.
+
+WHERE TO APPLY
+pmkisan.gov.in / Common Service Centre (CSC) / Village revenue officer

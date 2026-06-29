@@ -1,0 +1,21 @@
+SCHEME: Soil Health Card Scheme
+Level: national
+Source: https://soilhealth.dac.gov.in (verified 2026-06-29)
+
+OVERVIEW
+Free soil testing and a Soil Health Card reporting fertility and nutrient status with crop-wise fertiliser recommendations. Helps cut fertiliser cost by 20-30% and raise yields by 10-15%. Entirely free of cost.
+
+WHO IS ELIGIBLE
+Open to all landholding farmers; small and marginal farmers are prioritised.
+
+DOCUMENTS REQUIRED
+- Aadhaar card
+- Land records (khata/khatauni)
+- Mobile number
+- PM-KISAN ID (optional)
+
+HOW TO APPLY
+Apply online at soilhealth.dac.gov.in or the SHC app (Farmer's Corner), or offline at a local agriculture office / soil-testing lab / CSC; card is issued in 15-30 days after sample collection.
+
+WHERE TO APPLY
+soilhealth.dac.gov.in / District agriculture office / CSC

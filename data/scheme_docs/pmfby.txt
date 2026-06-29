@@ -1,0 +1,22 @@
+SCHEME: PMFBY (Pradhan Mantri Fasal Bima Yojana) - Crop Insurance
+Level: national
+Source: https://www.myscheme.gov.in/schemes/pmfby (verified 2026-06-29)
+
+OVERVIEW
+Crop insurance against natural calamities, pests and disease. Farmer pays only 2% premium for Kharif, 1.5% for Rabi, and 5% for commercial/horticultural crops; the rest is government-subsidised. From Kharif 2026, wild-animal attack and paddy inundation are added as localised add-on covers.
+
+WHO IS ELIGIBLE
+Only notified crops in notified areas are covered. Paddy is a notified crop in Chhattisgarh.
+
+DOCUMENTS REQUIRED
+- Aadhaar card
+- Land records or tenancy/sowing certificate
+- Bank account
+- Sowing declaration
+- Khasra/khatauni
+
+HOW TO APPLY
+Loanee farmers are enrolled automatically through their financing bank; non-loanee farmers enrol voluntarily before the cut-off date via the PMFBY portal, bank, CSC, or insurance agent.
+
+WHERE TO APPLY
+pmfby.gov.in / Financing bank / CSC
