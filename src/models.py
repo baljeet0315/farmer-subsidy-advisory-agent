@@ -35,7 +35,9 @@ class FarmerProfile(BaseModel):
     """Normalized farmer input, produced by any channel (web/WhatsApp/CLI)."""
 
     farmer_id: str
-    phone_hash: Optional[str] = None  # phone is hashed before it reaches here
+    phone: Optional[str] = None  # raw number, collected with consent (PII)
+    phone_hash: Optional[str] = None  # salted hash — stable identity/join key
+    consent_given: bool = False  # farmer consented to storing their number
     state: str = "Punjab"
     district: Optional[str] = None
     land_holding_ha: Optional[float] = None

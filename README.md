@@ -70,7 +70,7 @@ _TODO — see PROJECT_SPEC §15–16._
 
 ## 11. Responsible use
 
-Rules engine anchors hard eligibility; LLMs only explain retrieved content. Low-confidence cases require human review. Phone numbers are hashed; minimal personal data is stored. Every answer carries a "verify locally" disclaimer.
+Rules engine anchors hard eligibility; LLMs only explain retrieved content. Low-confidence cases require human review. Phone numbers are collected only with consent and stored alongside a salted hash that serves as the identity key; logs use the hash, never the raw number. Every answer carries a "verify locally" disclaimer.
 
 ## 12. Team
 

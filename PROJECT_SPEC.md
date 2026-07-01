@@ -121,7 +121,8 @@ These are what lift this above a typical submission:
 |---|---|---|
 | farmer_id | str | synthetic / hashed |
 | name | str | optional, not used in logic |
-| phone | str | **hashed** in storage/logs |
+| phone | str | raw stored **with consent**; salted **hash** used in logs + as identity key |
+| consent_given | bool | farmer consented to storing their number |
 | state / district | str | Punjab + district |
 | land_holding_ha | float | drives small/marginal classification |
 | land_ownership | enum | owner / tenant / sharecropper |
@@ -162,16 +163,28 @@ Simple, explainable scoring (e.g., weighted agreement → High / Medium / Low). 
 
 > Design principle: the LLMs never override the rules engine on hard criteria — disagreement *lowers confidence and triggers review*, it doesn't silently change the answer.
 
+### Delivery & human-in-the-loop (non-blocking)
+
+The farmer **never waits** on a human. Review is asynchronous oversight, not a gate:
+
+- **Farmer screen:** form → action checklist first (eligible scheme cards: what you get · documents · next step · confidence badge; plus not-eligible reasons + disclaimer) → **then** a follow-up chatbox appears below, seeded with "ask me about these schemes."
+- **High-confidence** items are shown immediately, clean.
+- **Low-confidence** items are shown immediately too, badged "⚠ Provisional — flagged for expert review, please verify locally," AND dropped into the reviewer dashboard queue.
+- **Reviewer dashboard** = oversight/correction queue (not a waiting room). When the reviewer approves/corrects a flagged case, the reviewed answer is **pushed to the farmer's WhatsApp** (uses the stored phone; depends on Twilio send, Day 8).
+- **Chat memory:** session-only (Streamlit session state) for now; persisting chat across return visits is deferred (see FUTURE_FEATURES).
+
 ---
 
 ## 9. Guardrails & responsible use
 
 - Rules engine is the source of truth for hard eligibility; LLMs explain, they don't decide hard facts.
 - Every claim is grounded in retrieved KB text; no free-floating scheme invention.
+- **Out-of-scope handling:** questions not strictly about the schemes/policies (or with no relevant retrieved passage) get a polite "no relevant information found — please ask about farmer schemes, or verify with your local office" message, never a guessed answer. Enforced via the system prompt (role) + a retrieval-relevance threshold.
+- **Roles:** every LLM call uses a **system** message (scope + grounding rules) and a **user** message (profile + rules verdict + retrieved passages); the follow-up chat keeps a **user/assistant** history. The system role is where "stay on-topic, stay grounded" is enforced.
 - Low-confidence → human review before delivery.
 - Every answer carries a "this is guidance, verify with your local agriculture office / CSC" disclaimer.
 - Punjabi and English are both treated as reliable, farmer-friendly output languages.
-- No legal/financial guarantees; no collection of sensitive data beyond what's needed; phone numbers hashed.
+- No legal/financial guarantees; no collection of sensitive data beyond what's needed; phone stored raw with consent + salted hash, logs use hash only.
 - Fallbacks: unknown input → ask; retrieval empty → say so honestly; LLM/API failure → graceful message + log.
 
 ---
@@ -181,6 +194,12 @@ Simple, explainable scoring (e.g., weighted agreement → High / Medium / Low). 
 **Quantitative.** A labeled set of ~30–50 synthetic farmer profiles, each annotated with the schemes they *should* match. Measure **precision / recall / F1** of the eligibility output vs. ground truth. Track **model-agreement rate** and **% routed to human**. Report a small table + confusion notes.
 
 **Qualitative.** 5–6 narrated end-to-end scenario walkthroughs (typical paddy smallholder, tenant farmer, SC/ST-targeted scheme, an intentionally ambiguous case that triggers human review, a "no schemes match" case). These double as demo-video material.
+
+**Hallucination / grounding tests.** A dedicated check that every LLM claim is supported by the retrieved passages, not invented:
+- Automated grounding check (`guardrails.ground_check`) run over eval cases → report a **grounding rate** (% of answers fully supported by retrieved text).
+- Adversarial out-of-scope prompts (e.g. "what's the weather", "tell me a loan shark") must return the polite no-info message, not an answer.
+- Fabrication probes: ask about a non-existent/other-state scheme → agent must decline rather than invent details.
+- Because eligibility is anchored by the deterministic rules engine, any LLM eligibility claim that contradicts the rules is caught by the confidence layer and flagged.
 
 ---
 

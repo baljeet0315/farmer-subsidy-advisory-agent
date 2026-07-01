@@ -32,6 +32,9 @@ FIELD_QUESTIONS: dict[str, str] = {
     "irrigation": "Is your land irrigated or rainfed? (irrigated / rainfed)",
     "category": "What is your social category? (general / sc / st / obc) — optional",
     "district": "Which district are you in? — optional",
+    # Collected on the web form (with consent). Stored raw + hashed; not used for
+    # eligibility. WhatsApp already knows the sender's number.
+    "phone": "Your mobile number (optional) — we store it only with your consent to help you follow up.",
 }
 
 
