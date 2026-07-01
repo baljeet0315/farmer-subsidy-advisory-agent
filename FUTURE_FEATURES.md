@@ -44,6 +44,17 @@ not a rewrite.
 
 <!-- Add new future ideas below this line, newest first. -->
 
+## 3. UI/UX polish (farmer app + reviewer dashboard)
+
+**Idea.** The current Streamlit UI is functional but plain. Planned refinements
+(to be detailed): visual branding/theme, cleaner card layout, Punjabi UI labels
+(not just answer language), mobile-friendly layout, progress/loading states, and
+possibly a more guided step-by-step intake.
+
+**Why deferred.** Day 7 focused on a working end-to-end UI. Cosmetic/UX changes
+are lower risk and can be layered on once the pipeline is locked. Add specific
+change requests here as they come up.
+
 ## 2. Persist follow-up chat across return visits
 
 **Idea.** Remember a farmer's past chatbox conversation when they come back later
