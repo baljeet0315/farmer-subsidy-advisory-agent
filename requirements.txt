@@ -3,9 +3,10 @@ python-dotenv>=1.0.0
 pandas>=2.2.0
 pydantic>=2.6.0
 
-# LLMs (two-model ensemble)
+# LLMs (three-model ensemble: Claude + OpenAI + Gemini)
 anthropic>=0.40.0
 openai>=1.40.0
+google-generativeai>=0.8.0
 
 # RAG / embeddings / vector store
 sentence-transformers>=3.0.0

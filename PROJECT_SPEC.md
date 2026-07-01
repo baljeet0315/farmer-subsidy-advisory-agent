@@ -11,7 +11,7 @@
 
 ## 1. Vision in one paragraph
 
-A small-farm owner in Chhattisgarh sends a WhatsApp message (or opens a web form), answers a few simple questions about their land, crop, and category, and gets back a clear, plain-language checklist of the government schemes and advisories they actually qualify for — what each gives them, the documents they need, and the next concrete step to claim it. Behind the scenes, two different LLMs independently reason about eligibility, a deterministic rules engine checks the hard criteria, and the system measures how much they agree. High agreement is delivered automatically; disagreement is flagged and routed to a human reviewer before anything goes to the farmer. The farmer stays informed; humans stay in control of the sensitive calls.
+A small-farm owner in Punjab sends a WhatsApp message (or opens a web form), answers a few simple questions about their land, crop, and category, and gets back a clear, plain-language checklist of the government schemes and advisories they actually qualify for — what each gives them, the documents they need, and the next concrete step to claim it. Behind the scenes, three different LLMs (Claude, OpenAI, Gemini) independently reason about eligibility, a deterministic rules engine checks the hard criteria, and the system measures how much they agree via majority vote. High agreement is delivered automatically; a split or a majority that contradicts the rules is flagged and routed to a human reviewer before anything goes to the farmer. The farmer stays informed; humans stay in control of the sensitive calls.
 
 ---
 
@@ -19,7 +19,7 @@ A small-farm owner in Chhattisgarh sends a WhatsApp message (or opens a web form
 
 **Problem.** India runs dozens of overlapping farmer support schemes (national + state). Eligibility rules are buried in PDFs and circulars, written in bureaucratic language, and farmers often don't know what applies to them or how to claim it. The cost of *not* knowing is real money and missed support.
 
-**Primary user.** A smallholder paddy farmer in Chhattisgarh (or someone helping them — a family member, a CSC/Common Service Centre operator, an agri-officer).
+**Primary user.** A smallholder paddy/wheat farmer in Punjab (or someone helping them — a family member, a CSC/Common Service Centre operator, an agri-officer).
 
 **Secondary user.** A reviewer/agri-officer who handles flagged, low-confidence cases.
 
@@ -32,11 +32,11 @@ A small-farm owner in Chhattisgarh sends a WhatsApp message (or opens a web form
 | Area | Decision |
 |---|---|
 | Ambition | Meaningfully beyond the minimum — portfolio-grade |
-| Region | India national schemes **+ Chhattisgarh** state schemes |
-| LLMs | **Two-model ensemble: Claude + OpenAI** with a confidence signal |
+| Region | India national schemes **+ Punjab** state schemes |
+| LLMs | **Three-model ensemble: Claude + OpenAI + Gemini** with a majority-vote confidence signal |
 | Eligibility logic | **Hybrid**: deterministic rules engine + RAG + LLM explanation |
 | Scheme coverage | **8–12 schemes, deep & accurate** (quality over quantity) |
-| Languages | **Hindi + English** (reliable) **+ Chhattisgarhi** (best-effort, disclaimed) |
+| Languages | **Punjabi + English** (both reliable) |
 | Confidence score | **Display to user + auto-route low-confidence to human** |
 | Human handoff | **Reviewer dashboard + queue** (Streamlit admin page) |
 | Channels | **Streamlit web app** (primary/demo) + **WhatsApp via Twilio** + **CLI** (for eval) |
@@ -52,7 +52,7 @@ A small-farm owner in Chhattisgarh sends a WhatsApp message (or opens a web form
 
 These are what lift this above a typical submission:
 
-1. **Two-LLM cross-verification with a real confidence score.** Not decoration — it drives the guardrail.
+1. **Three-LLM cross-verification with a real confidence score.** Majority vote across Claude/OpenAI/Gemini — not decoration; it drives the guardrail.
 2. **Confidence-gated human-in-the-loop.** Low agreement → reviewer queue → approve/edit → deliver. This *is* the responsible-AI story the brief asks for.
 3. **Hybrid eligibility** — auditable deterministic rules for hard facts, LLM only for retrieval-grounded explanation. Defensible in a sensitive domain.
 4. **Multi-channel, channel-agnostic core** — same agent serves web + WhatsApp.
@@ -122,7 +122,7 @@ These are what lift this above a typical submission:
 | farmer_id | str | synthetic / hashed |
 | name | str | optional, not used in logic |
 | phone | str | **hashed** in storage/logs |
-| state / district | str | Chhattisgarh + district |
+| state / district | str | Punjab + district |
 | land_holding_ha | float | drives small/marginal classification |
 | land_ownership | enum | owner / tenant / sharecropper |
 | category | enum | general / SC / ST / OBC |
@@ -146,7 +146,7 @@ These are what lift this above a typical submission:
 
 Plus a **document KB** (scheme notes / advisory text) feeding the vector store for RAG.
 
-**Candidate scheme set (to verify in Day 2 — not final):** national — PM-KISAN, PMFBY (crop insurance), Kisan Credit Card, Soil Health Card, PM-KUSUM; Chhattisgarh — Rajiv Gandhi Kisan Nyay Yojana, Godhan Nyay Yojana, and other active state agri schemes. *Exact list, current status, and rules to be confirmed against official sources during the data phase; anything unverifiable is dropped or labeled synthetic.*
+**Scheme set (verified 2026-06-29):** national (4) — PM-KISAN, Kisan Credit Card, Soil Health Card, PM-KUSUM; Punjab (4) — Free Agricultural Power (PSPCL), Crop Residue Management (CRM) machinery subsidy, Crop Diversification Programme (paddy→maize, ₹17,500/ha), SDRF/NDRF crop-loss relief. *Note: PMFBY (crop insurance) is intentionally excluded — Punjab has never joined PMFBY (still opted out as of 2026), so SDRF/NDRF relief is the de-facto substitute. This real-world nuance is captured in the KB and limitations.*
 
 ---
 
@@ -170,7 +170,7 @@ Simple, explainable scoring (e.g., weighted agreement → High / Medium / Low). 
 - Every claim is grounded in retrieved KB text; no free-floating scheme invention.
 - Low-confidence → human review before delivery.
 - Every answer carries a "this is guidance, verify with your local agriculture office / CSC" disclaimer.
-- Chhattisgarhi output is explicitly marked best-effort.
+- Punjabi and English are both treated as reliable, farmer-friendly output languages.
 - No legal/financial guarantees; no collection of sensitive data beyond what's needed; phone numbers hashed.
 - Fallbacks: unknown input → ask; retrieval empty → say so honestly; LLM/API failure → graceful message + log.
 
@@ -187,7 +187,7 @@ Simple, explainable scoring (e.g., weighted agreement → High / Medium / Low). 
 ## 11. Tech stack
 
 - **Language:** Python 3.11
-- **LLMs:** Anthropic Claude + OpenAI (via official SDKs), keys in `.env`
+- **LLMs:** Anthropic Claude + OpenAI + Google Gemini (via official SDKs), keys in `.env`
 - **RAG:** sentence-transformers / provider embeddings + **FAISS or Chroma** vector store
 - **Rules engine:** plain Python (transparent, unit-tested)
 - **Web UI:** Streamlit (farmer form + reviewer dashboard pages)
@@ -247,14 +247,14 @@ farmer_subsidy_and_advisory_navigation_agent/
 | 2 | Data: gather/verify real schemes, build `scheme_rules.csv` + docs + synthetic fill | KB ready, sources noted |
 | 3 | Rules engine + `FarmerProfile` intake + unit tests | Deterministic eligibility working |
 | 4 | RAG retriever over scheme docs | Grounded retrieval working |
-| 5 | Two-LLM reasoner + structured output parsing | Claude+OpenAI producing checklists |
+| 5 | Three-LLM reasoner + structured output parsing | Claude+OpenAI+Gemini producing checklists |
 | 6 | Confidence engine + human-routing logic | Confidence scores + queue |
 | 7 | Streamlit farmer app + reviewer dashboard | Working web demo end-to-end |
 | 8 | WhatsApp (Twilio) + deploy webhook; i18n (hi/en/cg) | WhatsApp bot live; trilingual output |
 | 9 | Eval suite (metrics) + scenarios; guardrails polish | Numbers + narrated runs |
 | 10 | README, report, slides, demo video, final cleanup | Submission package |
 
-> Critical path = Days 2–7. WhatsApp + Chhattisgarhi are the first things to descope if a day slips; web app + eval must land.
+> Critical path = Days 2–7. WhatsApp is the first thing to descope if a day slips; web app + eval must land.
 
 ---
 
@@ -280,7 +280,7 @@ farmer_subsidy_and_advisory_navigation_agent/
 |---|---|
 | Real scheme data sparse/outdated | Curate what's verifiable, label synthetic fill clearly, cite sources + last-verified date |
 | WhatsApp/Twilio + hosting eats time | Channel-agnostic core; web app is the guaranteed demo; WhatsApp is additive |
-| Chhattisgarhi LLM quality weak | Hindi is the reliable regional language; CG marked best-effort with disclaimer |
+| Punjab has no PMFBY | Correctly excluded from KB; SDRF/NDRF relief included instead + noted in limitations |
 | Two-LLM cost/latency | Cache, limit candidate set before LLM calls, run models in parallel |
 | Over-promising in a sensitive domain | Rules-anchored answers, confidence + human review, persistent "verify locally" disclaimer |
 | Solo bandwidth | Strict critical path; stretch goals clearly marked |
@@ -290,7 +290,7 @@ farmer_subsidy_and_advisory_navigation_agent/
 ## 16. Open questions for you
 
 1. Do you already have **Claude and OpenAI API keys**, or should the plan include a free-tier fallback (e.g., Groq/Gemini) so cost is zero?
-2. Any **specific Chhattisgarh district** you want as the demo persona's home (affects which local schemes feel most relevant)?
+2. Any **specific Punjab district** you want as the demo persona's home (personas currently span Ludhiana, Amritsar, Bathinda, Sangrur, Patiala, Gurdaspur, Hoshiarpur, Firozpur)?
 3. For the reviewer dashboard — is a **single shared admin view** fine for the demo, or do you want basic login/roles?
 4. Demo video — **screen-recording walkthrough** only, or do you also want a short scripted "farmer story" intro?
 

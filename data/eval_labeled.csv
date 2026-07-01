@@ -1,9 +1,9 @@
 farmer_id,expected_scheme_ids
-F001,pm_kisan;pmfby;kcc;soil_health_card;pm_kusum;cg_krishak_unnati;cg_krishak_jeevan_jyoti;cg_vriksha_sampada
-F002,pm_kisan;pmfby;kcc;soil_health_card;pm_kusum;cg_krishak_unnati;cg_vriksha_sampada
-F003,cg_bhoomihin_majdoor
-F004,pm_kisan;pmfby;kcc;soil_health_card;pm_kusum;cg_krishak_unnati;cg_krishak_jeevan_jyoti;cg_vriksha_sampada
-F005,pmfby;kcc;soil_health_card
-F006,cg_bhoomihin_majdoor
-F007,pm_kisan;pmfby;kcc;soil_health_card;pm_kusum;cg_krishak_unnati;cg_vriksha_sampada
-F008,pm_kisan;pmfby;kcc;soil_health_card;pm_kusum;cg_krishak_unnati;cg_krishak_jeevan_jyoti;cg_vriksha_sampada
+P001,pm_kisan;kcc;soil_health_card;pm_kusum;pb_free_power;pb_crm_subsidy;pb_crop_diversification;pb_sdrf_crop_relief
+P002,pm_kisan;kcc;soil_health_card;pm_kusum;pb_free_power;pb_crm_subsidy;pb_sdrf_crop_relief
+P003,pm_kisan;kcc;soil_health_card;pm_kusum;pb_free_power;pb_crm_subsidy;pb_sdrf_crop_relief
+P004,
+P005,pm_kisan;kcc;soil_health_card;pm_kusum;pb_free_power;pb_crm_subsidy;pb_crop_diversification;pb_sdrf_crop_relief
+P006,kcc;soil_health_card;pb_sdrf_crop_relief
+P007,pm_kisan;kcc;soil_health_card;pm_kusum;pb_crm_subsidy;pb_sdrf_crop_relief
+P008,pm_kisan;kcc;soil_health_card;pm_kusum;pb_free_power;pb_crm_subsidy;pb_crop_diversification;pb_sdrf_crop_relief

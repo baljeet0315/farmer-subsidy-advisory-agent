@@ -86,7 +86,7 @@ def profile_from_row(row: dict) -> FarmerProfile:
     return FarmerProfile(
         farmer_id=row.get("farmer_id") or "unknown",
         phone_hash=row.get("phone_hash") or None,
-        state=row.get("state") or "Chhattisgarh",
+        state=row.get("state") or "Punjab",
         district=row.get("district") or None,
         land_holding_ha=_to_float(row.get("land_holding_ha", "")),
         land_ownership=_to_enum(LandOwnership, row.get("land_ownership", "")),
@@ -97,5 +97,5 @@ def profile_from_row(row: dict) -> FarmerProfile:
         has_kcc=_to_bool(row["has_kcc"]) if row.get("has_kcc") not in (None, "") else None,
         bank_account=_to_bool(row["bank_account"]) if row.get("bank_account") not in (None, "") else None,
         aadhaar_linked=_to_bool(row["aadhaar_linked"]) if row.get("aadhaar_linked") not in (None, "") else None,
-        language=row.get("language") or "hi",
+        language=row.get("language") or "pa",
     )

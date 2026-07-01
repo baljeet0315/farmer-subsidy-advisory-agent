@@ -1,0 +1,21 @@
+SCHEME: Crop Loss Relief under SDRF/NDRF (Punjab)
+Level: state
+Source: https://agri.punjab.gov.in/ (verified 2026-06-29)
+
+OVERVIEW
+Because Punjab does not implement PMFBY crop insurance, crop-loss compensation is provided under SDRF/NDRF norms — up to about Rs 17,000 per hectare for losses (subject to notified disaster and area limits). This is the state's de-facto insurance substitute.
+
+WHO IS ELIGIBLE
+Punjab has NOT joined PMFBY (opted out; still out as of 2026), so farmers rely on SDRF/NDRF relief for crop loss. Compensation is disaster-triggered, not a premium-based insurance.
+
+DOCUMENTS REQUIRED
+- Aadhaar card
+- Land records
+- Bank account
+- Girdawari / crop-loss assessment (special girdawari) by revenue staff
+
+HOW TO APPLY
+After a notified natural calamity, the revenue department conducts a special girdawari; eligible farmers receive compensation directly. No prior enrolment needed.
+
+WHERE TO APPLY
+District Revenue / Deputy Commissioner office (special girdawari)

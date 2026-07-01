@@ -1,9 +1,9 @@
 farmer_id,state,district,land_holding_ha,land_ownership,category,gender,primary_crop,irrigation,has_kcc
-F001,Chhattisgarh,Raipur,1.2,owner,obc,male,paddy,irrigated,False
-F002,Chhattisgarh,Durg,0.8,owner,sc,female,paddy,rainfed,False
-F003,Chhattisgarh,Bastar,0.0,sharecropper,st,male,paddy,rainfed,False
-F004,Chhattisgarh,Bilaspur,3.5,owner,general,male,paddy,irrigated,True
-F005,Chhattisgarh,Raigarh,2.0,tenant,obc,male,vegetables,irrigated,False
-F006,Chhattisgarh,Rajnandgaon,0.0,sharecropper,st,female,paddy,rainfed,False
-F007,Chhattisgarh,Korba,1.5,owner,general,male,paddy,rainfed,False
-F008,Chhattisgarh,Janjgir-Champa,5.0,owner,general,male,paddy,irrigated,True
+P001,Punjab,Ludhiana,2.0,owner,general,male,paddy,irrigated,False
+P002,Punjab,Amritsar,1.0,owner,sc,male,wheat,irrigated,False
+P003,Punjab,Bathinda,3.0,owner,general,male,cotton,irrigated,True
+P004,Punjab,Sangrur,0.0,sharecropper,sc,male,paddy,rainfed,False
+P005,Punjab,Patiala,5.0,owner,general,male,paddy,irrigated,True
+P006,Punjab,Gurdaspur,1.5,tenant,obc,female,maize,irrigated,False
+P007,Punjab,Hoshiarpur,0.8,owner,general,male,vegetables,rainfed,False
+P008,Punjab,Firozpur,2.5,owner,general,male,paddy,irrigated,False

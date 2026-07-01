@@ -1,6 +1,6 @@
 # Farmer Subsidy & Advisory Navigation Agent
 
-> An AI agent that helps Chhattisgarh farmers discover the government schemes and advisories they actually qualify for — delivered as a plain-language action checklist over web and WhatsApp, with two-LLM cross-verification, a confidence score, and human review for sensitive cases.
+> An AI agent that helps Punjab farmers discover the government schemes and advisories they actually qualify for — delivered as a plain-language action checklist over web and WhatsApp, with three-LLM cross-verification, a confidence score, and human review for sensitive cases.
 
 **Status:** 🚧 In development · Solo project · See [`PROJECT_SPEC.md`](PROJECT_SPEC.md) for the full vision.
 
@@ -12,12 +12,12 @@ Farmers often don't know which government subsidies or advisory services apply t
 
 ## 2. Dataset / reference source
 
-- **Primary:** Data.gov.in agriculture datasets + official national & Chhattisgarh scheme notes — https://www.data.gov.in/keywords/agriculture
+- **Primary:** Data.gov.in agriculture datasets + official national & Punjab scheme notes — https://www.data.gov.in/keywords/agriculture
 - **Form:** Curated real scheme data in `data/scheme_rules.csv` + advisory text in `data/scheme_docs/`, supplemented with clearly-labeled synthetic records (`is_synthetic` flag) where official data is sparse. Sources and `last_verified` dates are recorded per scheme.
 
 ## 3. Tools used
 
-Python · Anthropic Claude + OpenAI (two-model ensemble) · ChromaDB + sentence-transformers (RAG) · Streamlit (web + reviewer dashboard) · FastAPI + Twilio (WhatsApp) · SQLite · pytest / scikit-learn (eval).
+Python · Anthropic Claude + OpenAI + Google Gemini (three-model ensemble) · ChromaDB + sentence-transformers (RAG) · Streamlit (web + reviewer dashboard) · FastAPI + Twilio (WhatsApp) · SQLite · pytest / scikit-learn (eval).
 
 ## 4. Project workflow
 
@@ -26,7 +26,7 @@ Intake → completeness check → deterministic rules pass → RAG retrieval →
 ## 5. AI / agent component
 
 - **Hybrid eligibility:** deterministic rules engine for hard criteria + RAG-grounded LLM explanation.
-- **Two-LLM cross-verification:** Claude and OpenAI reason independently; agreement between them and with the rules engine yields a **confidence score**.
+- **Three-LLM cross-verification:** Claude, OpenAI, and Gemini reason independently; majority agreement among them and with the rules engine yields a **confidence score**.
 - **Confidence-gated human-in-the-loop:** high confidence auto-delivers; low confidence routes to a reviewer queue.
 
 ## 6. How to run
@@ -60,7 +60,7 @@ _TODO — eligibility precision/recall, model-agreement rate, % routed to human 
 
 ## 9. Limitations
 
-- Chhattisgarhi output is best-effort and should be verified.
+- Punjab does not implement PMFBY crop insurance; the KB reflects this and uses SDRF/NDRF relief instead.
 - Scheme data is a curated snapshot; rules and availability change — always verify with the local agriculture office / CSC.
 - Not legal or financial advice. See `docs/` responsible-use notes.
 

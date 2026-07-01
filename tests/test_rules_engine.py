@@ -1,4 +1,4 @@
-"""Unit tests for the deterministic rules engine.
+"""Unit tests for the deterministic rules engine (Punjab knowledge base).
 
 Two layers:
   1. Targeted unit tests for specific rule behaviours and edge cases.
@@ -33,10 +33,10 @@ def _scheme(schemes, scheme_id):
 def _profile(**kw) -> FarmerProfile:
     base = dict(
         farmer_id="T",
-        state="Chhattisgarh",
-        land_holding_ha=1.0,
+        state="Punjab",
+        land_holding_ha=2.0,
         land_ownership=LandOwnership.OWNER,
-        category=Category.OBC,
+        category=Category.GENERAL,
         primary_crop="paddy",
         irrigation="irrigated",
     )
@@ -46,59 +46,55 @@ def _profile(**kw) -> FarmerProfile:
 
 # --- targeted behaviour tests -------------------------------------------------
 
-def test_owner_paddy_qualifies_for_krishak_unnati(schemes):
-    res = check(_profile(), _scheme(schemes, "cg_krishak_unnati"))
+def test_owner_paddy_qualifies_for_crop_diversification(schemes):
+    res = check(_profile(), _scheme(schemes, "pb_crop_diversification"))
     assert res.passed
     assert "Eligible" in res.reason
 
 
-def test_tenant_excluded_from_krishak_unnati(schemes):
-    res = check(_profile(land_ownership=LandOwnership.TENANT), _scheme(schemes, "cg_krishak_unnati"))
-    assert not res.passed
-    assert "land ownership" in res.reason
-
-
-def test_vegetable_grower_excluded_from_paddy_scheme(schemes):
-    res = check(_profile(primary_crop="vegetables"), _scheme(schemes, "cg_krishak_unnati"))
+def test_wheat_grower_excluded_from_maize_incentive(schemes):
+    # Crop diversification (paddy->maize) targets current paddy growers.
+    res = check(_profile(primary_crop="wheat"), _scheme(schemes, "pb_crop_diversification"))
     assert not res.passed
     assert "crop" in res.reason
 
 
-def test_landless_qualifies_only_for_bhoomihin(schemes):
-    p = _profile(land_holding_ha=0.0, land_ownership=LandOwnership.SHARECROPPER)
-    elig = {s.scheme_id for s in filter_candidates(p, schemes)}
-    assert elig == {"cg_bhoomihin_majdoor"}
-
-
-def test_landholder_excluded_from_bhoomihin(schemes):
-    res = check(_profile(land_holding_ha=2.0), _scheme(schemes, "cg_bhoomihin_majdoor"))
-    assert not res.passed
-
-
-def test_rainfed_excluded_from_jeevan_jyoti(schemes):
-    res = check(_profile(irrigation="rainfed"), _scheme(schemes, "cg_krishak_jeevan_jyoti"))
+def test_rainfed_owner_excluded_from_free_power(schemes):
+    # Free power needs an irrigated (pump-connected) holding.
+    res = check(_profile(irrigation="rainfed"), _scheme(schemes, "pb_free_power"))
     assert not res.passed
     assert "irrigation" in res.reason
 
 
-def test_non_cg_state_excluded_from_state_schemes(schemes):
-    p = _profile(state="Punjab")
-    elig = {s.scheme_id for s in filter_candidates(p, schemes)}
-    assert not any(sid.startswith("cg_") for sid in elig)
-    # national schemes still apply
-    assert "pm_kisan" in elig
+def test_landless_qualifies_for_nothing(schemes):
+    # A landless labourer matches no land-based scheme -> no-match path.
+    p = _profile(land_holding_ha=0.0, land_ownership=LandOwnership.SHARECROPPER, irrigation="rainfed")
+    assert filter_candidates(p, schemes) == []
 
 
-def test_tenant_qualifies_for_kcc_and_pmfby(schemes):
-    p = _profile(land_ownership=LandOwnership.TENANT)
+def test_tenant_excluded_from_owner_only_schemes(schemes):
+    p = _profile(land_ownership=LandOwnership.TENANT, primary_crop="maize")
     elig = {s.scheme_id for s in filter_candidates(p, schemes)}
-    assert {"kcc", "pmfby", "soil_health_card"} <= elig
-    assert "pm_kisan" not in elig  # PM-KISAN requires ownership
+    # tenant keeps KCC, Soil Health Card, and SDRF relief; loses PM-KISAN & state owner-only schemes
+    assert {"kcc", "soil_health_card", "pb_sdrf_crop_relief"} == elig
+    assert "pm_kisan" not in elig
+    assert "pb_free_power" not in elig
+
+
+def test_pmfby_absent_from_punjab_kb(schemes):
+    # Punjab does not implement PMFBY; it must not be in the knowledge base.
+    assert all(s.scheme_id != "pmfby" for s in schemes)
+
+
+def test_non_punjab_state_excluded_from_state_schemes(schemes):
+    p = _profile(state="Haryana")
+    elig = {s.scheme_id for s in filter_candidates(p, schemes)}
+    assert not any(sid.startswith("pb_") for sid in elig)
+    assert "pm_kisan" in elig  # national schemes still apply
 
 
 def test_missing_land_is_not_determinable(schemes):
-    p = _profile(land_holding_ha=None)
-    res = check(p, _scheme(schemes, "pm_kisan"))
+    res = check(_profile(land_holding_ha=None), _scheme(schemes, "pm_kisan"))
     assert not res.passed
     assert not res.determinable
     assert "land_holding_ha" in res.missing_info
@@ -119,7 +115,6 @@ def test_complete_profile_has_no_next_question():
 
 
 def test_landless_zero_is_complete():
-    # land_holding_ha == 0 must count as answered, not missing.
     p = _profile(land_holding_ha=0.0)
     assert "land_holding_ha" not in missing_fields(p)
 
@@ -128,7 +123,10 @@ def test_landless_zero_is_complete():
 
 def _load_eval():
     with open(EVAL_CSV, newline="", encoding="utf-8") as f:
-        return {r["farmer_id"]: set(r["expected_scheme_ids"].split(";")) for r in csv.DictReader(f)}
+        return {
+            r["farmer_id"]: {x for x in r["expected_scheme_ids"].split(";") if x}
+            for r in csv.DictReader(f)
+        }
 
 
 def test_engine_matches_eval_ground_truth(schemes):

@@ -36,7 +36,7 @@ class FarmerProfile(BaseModel):
 
     farmer_id: str
     phone_hash: Optional[str] = None  # phone is hashed before it reaches here
-    state: str = "Chhattisgarh"
+    state: str = "Punjab"
     district: Optional[str] = None
     land_holding_ha: Optional[float] = None
     land_ownership: Optional[LandOwnership] = None
@@ -47,7 +47,7 @@ class FarmerProfile(BaseModel):
     has_kcc: Optional[bool] = None
     bank_account: Optional[bool] = None
     aadhaar_linked: Optional[bool] = None
-    language: str = "hi"  # hi | en | cg
+    language: str = "pa"  # pa | en
 
 
 class Scheme(BaseModel):
