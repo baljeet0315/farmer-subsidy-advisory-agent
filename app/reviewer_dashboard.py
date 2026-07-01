@@ -17,14 +17,21 @@ import streamlit as st
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src import store  # noqa: E402
+from src import messaging, store  # noqa: E402
 
 
-def notify_farmer(case: dict, decision: str, note: str) -> None:
-    """Push the reviewed answer to the farmer's WhatsApp. TODO (Day 8): Twilio send.
-    For now, record the intent in the audit log."""
+def notify_farmer(case: dict, decision: str, note: str) -> dict:
+    """Push the reviewed answer to the farmer's WhatsApp (if we have a consented
+    number) and record the intent in the audit log."""
     store.log_step(case.get("phone_hash"), "review_notify",
                    {"scheme_id": case["scheme_id"], "decision": decision, "note": note})
+    phone = store.get_phone_by_hash(case.get("phone_hash"))
+    if not phone:
+        return {"ok": False, "error": "no consented number on file"}
+    verb = "confirmed" if decision == "approved" else "updated"
+    body = (f"Update on your scheme '{case['scheme_name']}': our team has {verb} it. "
+            f"{note or ''}\nThis is guidance — please verify with your local agriculture office / CSC.")
+    return messaging.send_whatsapp(phone, body)
 
 
 def main():

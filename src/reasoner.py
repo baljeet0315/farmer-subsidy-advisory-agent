@@ -18,6 +18,7 @@ import concurrent.futures
 import json
 import re
 
+from . import i18n
 from .llm_clients import LLMClient, get_default_clients
 from .models import FarmerProfile, Scheme
 
@@ -52,11 +53,13 @@ def build_user_prompt(profile: FarmerProfile, scheme: Scheme, passages: list[str
         f"Already has KCC: {profile.has_kcc}\n"
     )
     joined = "\n---\n".join(passages) if passages else "(no passages retrieved)"
+    lang = i18n.lang_instruction(getattr(profile, "language", "en"))
     return (
         f"SCHEME: {scheme.scheme_name}\n\n"
         f"FARMER PROFILE:\n{prof}\n"
         f"SCHEME PASSAGES (your only source of truth):\n{joined}\n\n"
         "Is this farmer eligible for this scheme? Respond with the JSON object only."
+        f"{lang}"
     )
 
 

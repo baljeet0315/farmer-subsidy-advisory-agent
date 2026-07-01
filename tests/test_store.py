@@ -54,6 +54,16 @@ def test_review_queue_roundtrip(tmp_path):
     assert len(approved) == 1 and approved[0]["reviewer_note"] == "verified with district office"
 
 
+def test_get_phone_by_hash_respects_consent(tmp_path):
+    db = str(tmp_path / "t.db")
+    store.save_profile(_profile(consent=True, phone="9111100000"), db_path=db)
+    store.save_profile(_profile(consent=False, phone="9222200000"), db_path=db)
+    # consented number is recoverable for notification
+    assert store.get_phone_by_hash(store.hash_phone("9111100000"), db_path=db) == "9111100000"
+    # non-consented number is NOT recoverable
+    assert store.get_phone_by_hash(store.hash_phone("9222200000"), db_path=db) is None
+
+
 def test_log_step_uses_hash(tmp_path):
     db = str(tmp_path / "t.db")
     store.log_step(store.hash_phone("9876500000"), "assessment", {"delivered": 5}, db_path=db)

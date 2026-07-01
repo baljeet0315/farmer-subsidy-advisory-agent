@@ -11,20 +11,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from . import confidence, reasoner
+from . import confidence, guardrails, i18n, reasoner
 from .llm_clients import LLMClient, get_default_clients
 from .models import ChecklistItem, EligibilityResult, FarmerProfile, Scheme
 from .retriever import retrieve
 from .rules_engine import RuleCheck, check, evaluate_all, filter_candidates
 from .utils import load_schemes, profile_from_row
 
-NO_INFO_MSG = (
-    "I couldn't find relevant information about that in the scheme documents. "
-    "Please ask about the farmer schemes you're eligible for, or verify with your "
-    "local agriculture office / CSC."
-)
-# Chroma cosine distance above which a retrieved passage is treated as irrelevant.
-RELEVANCE_MAX_DISTANCE = 1.35
+NO_INFO_MSG = guardrails.fallback("no_retrieval")
+RELEVANCE_MAX_DISTANCE = guardrails.RELEVANCE_MAX_DISTANCE
 
 # Fields needed before eligibility can be meaningfully assessed. district and
 # category are optional (improve precision but not strictly required).
@@ -92,14 +87,23 @@ class AssessedScheme:
     model_outputs: dict
 
 
-def _checklist_item(scheme: Scheme, result: EligibilityResult, model_outputs: dict) -> ChecklistItem:
+def _checklist_item(scheme: Scheme, result: EligibilityResult, model_outputs: dict,
+                    passages: list[str], language: str = "en") -> ChecklistItem:
     """Build the farmer-facing card. Benefit/documents come from the authoritative
-    KB; the plain-language 'why' prefers a grounded model explanation."""
+    KB; the plain-language 'why' uses a model explanation only if it passes the
+    grounding guardrail (self-reported grounded flag + lexical check for English)."""
     explanation = ""
     for out in model_outputs.values():
-        if out.get("ok") and out.get("grounded") and out.get("explanation"):
-            explanation = out["explanation"]
-            break
+        cand = out.get("explanation") or ""
+        if not (out.get("ok") and out.get("grounded") and cand):
+            continue
+        # Lexical grounding check only applies to English (script-based overlap).
+        if language == "en":
+            ok, _ = guardrails.ground_check(cand, passages)
+            if not ok:
+                continue
+        explanation = cand
+        break
     what = scheme.benefit_summary
     if explanation:
         what = f"{scheme.benefit_summary}  (Why you qualify: {explanation})"
@@ -109,6 +113,7 @@ def _checklist_item(scheme: Scheme, result: EligibilityResult, model_outputs: di
         documents_needed=[d.strip() for d in scheme.documents_required.split("|")],
         next_step=f"{scheme.application_process}  Apply at: {scheme.where_to_apply}",
         confidence=result.confidence,
+        note=guardrails.DISCLAIMER,
     )
 
 
@@ -135,7 +140,8 @@ def assess_with_llms(profile: FarmerProfile, clients: list[LLMClient] | None = N
                                                  scheme_ids=[scheme.scheme_id], k=k)]
         model_outputs = reasoner.reason_all(profile, scheme, passages, clients=clients)
         result = confidence.score(scheme.scheme_id, rc.passed, model_outputs)
-        item = _checklist_item(scheme, result, model_outputs)
+        item = _checklist_item(scheme, result, model_outputs, passages,
+                               language=getattr(profile, "language", "en"))
         assessed.append(AssessedScheme(scheme, rc, result, item, model_outputs))
     return assessed
 
@@ -170,14 +176,18 @@ def answer_followup(profile: FarmerProfile, question: str, eligible_scheme_ids: 
     Out-of-scope / no relevant passage -> polite NO_INFO_MSG (never a guess).
     """
     hits = retrieve(question, scheme_ids=eligible_scheme_ids or None, k=k)
-    relevant = [h for h in hits if h["distance"] <= RELEVANCE_MAX_DISTANCE]
-    if not relevant:
+    if guardrails.is_out_of_scope(hits):
         return NO_INFO_MSG
+    relevant = [h for h in hits if h["distance"] <= RELEVANCE_MAX_DISTANCE]
 
     clients = clients if clients is not None else get_default_clients()
     if not clients:
         return NO_INFO_MSG
     passages = "\n---\n".join(h["text"] for h in relevant)
-    user = f"SCHEME PASSAGES:\n{passages}\n\nFARMER QUESTION: {question}\n\nAnswer from the passages only."
+    lang = i18n.lang_instruction(getattr(profile, "language", "en"))
+    user = (f"SCHEME PASSAGES:\n{passages}\n\nFARMER QUESTION: {question}\n\n"
+            f"Answer from the passages only.{lang}")
     res = clients[0].complete(FOLLOWUP_SYSTEM, user)
-    return res.text if res.ok and res.text else NO_INFO_MSG
+    if not (res.ok and res.text):
+        return guardrails.fallback("api_error")
+    return guardrails.apply_disclaimer(res.text)

@@ -138,6 +138,21 @@ def resolve_review(review_id: int, status: str, note: str = "", db_path: str | N
         )
 
 
+def get_phone_by_hash(phone_hash: str, db_path: str | None = None) -> str | None:
+    """Return the raw phone for a hash IF it was stored with consent, else None.
+    Used to notify a farmer of a reviewed result on WhatsApp."""
+    if not phone_hash:
+        return None
+    init_db(db_path)
+    with _conn(db_path) as c:
+        row = c.execute(
+            "SELECT phone FROM profiles WHERE phone_hash = ? AND consent_given = 1 "
+            "AND phone IS NOT NULL ORDER BY created_at DESC LIMIT 1",
+            (phone_hash,),
+        ).fetchone()
+        return row["phone"] if row else None
+
+
 def log_step(farmer_hash: str | None, event: str, detail: dict | None = None, db_path: str | None = None) -> None:
     """Append an audit log entry. Uses the phone hash, never the raw number."""
     init_db(db_path)
